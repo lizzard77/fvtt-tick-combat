@@ -1,0 +1,11 @@
+<form class="flexrow">
+    {{#each list}}
+    <div class="flexcol" style="border: 2px solid lime; margin-right: 1em; width: 4ex;">
+        {{this.name}}<br />
+        <input id={{this.id}} type="number" class="ticks" value={{this.ticks}} />
+    </div>
+    {{/each}}
+    <div class="flexcol" style="border: 2px solid lime; margin-right: 1em; width: 4ex;">
+        <button id="addEventButton">+</button>
+    </div>
+</form>
