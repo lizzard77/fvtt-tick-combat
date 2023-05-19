@@ -2,6 +2,7 @@
 export async function setTicks(combatant, value = 0)
 {
     await combatant.setFlag('tick-combat', 'ticks', value);
+    await game.combat?.setInitiative(combatant.id, value);
 }
 
 export async function normalizeTicks()
@@ -14,12 +15,11 @@ export async function normalizeTicks()
         if (c.isEvent)
         {
             c.ticks = newTicks;
-            await updateEvent(game.combat, c);
+            await updateEvent(c);
         } 
         else 
         {
-            await c.combatant.setFlag('tick-combat', 'ticks', newTicks);
-            await game.combat?.setInitiative(c.id, newTicks);
+            await setTicks(c.combatant, newTicks);
         }
     }
  

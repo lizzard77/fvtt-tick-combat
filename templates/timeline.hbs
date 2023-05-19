@@ -1,11 +1,16 @@
-<form class="flexrow">
+<form style="display: flex; flex: 1; flex-wrap: nowrap; ">
     {{#each list}}
-    <div class="flexcol" style="border: 2px solid lime; margin-right: 1em; width: 4ex;">
-        {{this.name}}<br />
-        <input id={{this.id}} type="number" class="ticks" value={{this.ticks}} />
-    </div>
+        <div class="flexcol" style="justify-content: flex-start; align-items: flex-start; margin-right: 5px;">
+            <h2 style="flex: 0;">{{this.ticks}}</h2>
+            {{#each this.items}}
+            <div style="flex: 0;">
+                {{this.name}}<br />
+                <input id={{this.id}} type="number" class="ticks" value={{this.ticks}} style="width: 50px;" />
+            </div>
+            {{/each}}
+        </div>
     {{/each}}
-    <div class="flexcol" style="border: 2px solid lime; margin-right: 1em; width: 4ex;">
+    <!--div class="flexcol" style="border: 2px solid lime; margin-right: 1em; width: 4ex;">
         <button id="addEventButton">+</button>
-    </div>
+    </div-->
 </form>

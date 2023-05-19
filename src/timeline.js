@@ -6,11 +6,13 @@ export class TimelineApp extends Application
     {
         const defaults = super.defaultOptions;
         const overrides = {
-            height: '150',
+            height: 'auto',
             width: 'auto',
             id: 'timeline-app',
             template: `modules/tick-combat/templates/timeline.hbs`,
-            title: 'Timeline'
+            title: 'Timeline',
+            popOut: true,
+            resizable: true,
         };
 
         const mergedOptions = foundry.utils.mergeObject(defaults, overrides);
@@ -19,8 +21,22 @@ export class TimelineApp extends Application
 
     async getData() 
     {
+        const list = await getList();
+        let final = [];
+        for (const ev of list) 
+        {
+            let l = final.find(x => x.ticks === ev.ticks);
+            if (!l)
+            {
+                l = { ticks: ev.ticks, items: [ ev ]  };
+                final.push(l);
+            } else {
+                l.items.push(ev);
+            }
+        }
+
         return {
-            list : await getList()
+            list : final
         }
     };
 
@@ -37,31 +53,29 @@ export class TimelineApp extends Application
         event.preventDefault();
         await addEvent({ name: "New Event", ticks: 3 });
         await normalizeTicks();
-        this.render(true);
     }
 
     async _handleRemoveEvent(event) {
         event.preventDefault();
         await removeEvent(event.currentTarget.id);
         await normalizeTicks();
-        this.render(true);
     }
 
     async _handleChangeTicks(event) {
+        const newTick = event.currentTarget.value;
         const combatant = getCombatant(event.currentTarget.id);
+        const ev = await getEventById(event.currentTarget.id);
+
         if (combatant)
-            await setTicks(combatant, event.currentTarget.value);
-        else 
         {
-            const ev = await getEventById(event.currentTarget.id);
-            if (ev)
-            {
-                ev.ticks = event.currentTarget.value;
-                await updateEvent(ev);
-            }
+            await setTicks(combatant, newTick);
+        }
+        else if (ev)
+        {
+            ev.ticks = newTick;
+            await updateEvent(ev);
         }
         await normalizeTicks();
-        this.render(true);
     }
     
 };
