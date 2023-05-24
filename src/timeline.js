@@ -1,4 +1,25 @@
-import { addEvent, getCombatant, getEventById, getList, normalizeTicks, removeEvent, setTicks, updateEvent } from "./data.js";
+import { getCombatant, getEventById, getList, getCombatantInfo, normalizeTicks, removeEvent, setTicks, updateEvent } from "./data.js";
+import { editEvent } from "./editEvent.js";
+
+Hooks.on("getApplicationHeaderButtons", async (app, buttons) => {
+
+    if (app.id === "timeline-app")
+    {
+        buttons.unshift({
+            label: "Add Event",
+            class: "addEventButton",
+            icon: "fas fa-plus",
+            onclick: async () => {
+                const data = {
+                    name: "New Event",
+                    ticks: 100,
+                    ffwd: 1
+                };
+                await editEvent(data);
+            }
+        });
+    }
+});
 
 export class TimelineApp extends Application 
 {
@@ -35,6 +56,8 @@ export class TimelineApp extends Application
             }
         }
 
+        this.width = final.length * 150;
+
         return {
             list : final
         }
@@ -43,17 +66,12 @@ export class TimelineApp extends Application
     activateListeners(html) 
     {
         super.activateListeners(html);
-        html.on('click', "#addEventButton", this._handleAddEvent.bind(this));
         html.on('click', "#removeEventButton", this._handleRemoveEvent.bind(this));
         html.on('blur', "input.ticks", this._handleChangeTicks.bind(this));
-
+        html.on('click', ".name", this._editItem.bind(this));
+        html.on('click', ".ffwd", this._ffwdEvent.bind(this));
+        html.on('click', ".delete", this._deleteEvent.bind(this));
     };
-
-    async _handleAddEvent(event) {
-        event.preventDefault();
-        await addEvent({ name: "New Event", ticks: 3 });
-        await normalizeTicks();
-    }
 
     async _handleRemoveEvent(event) {
         event.preventDefault();
@@ -61,14 +79,45 @@ export class TimelineApp extends Application
         await normalizeTicks();
     }
 
+    async _editItem(event) {
+        event.preventDefault();
+        const ev = await getEventById(event.currentTarget.dataset.id);
+        if (ev)
+        {
+            await editEvent(ev);
+        }
+    }
+
+    async _ffwdEvent(event) {
+        event.preventDefault();
+        const ev = await getEventById(event.currentTarget.dataset.id);
+        if (ev)
+        {
+            ev.ticks = ev.ticks + ev.ffwd;
+            await updateEvent(ev);
+            await normalizeTicks();
+        }
+    }
+
+    async _deleteEvent(event) {
+        event.preventDefault();
+        const ev = await getEventById(event.currentTarget.dataset.id);
+        if (ev)
+        {
+            await removeEvent(ev);
+            await normalizeTicks();
+        }
+    }
+
     async _handleChangeTicks(event) {
-        const newTick = event.currentTarget.value;
-        const combatant = getCombatant(event.currentTarget.id);
-        const ev = await getEventById(event.currentTarget.id);
+        const newTick = parseInt(event.currentTarget.value);
+        const combatant = getCombatant(event.currentTarget.dataset.id);
+        const ev = await getEventById(event.currentTarget.dataset.id);
 
         if (combatant)
         {
-            await setTicks(combatant, newTick);
+            const current = (await getCombatantInfo(combatant)).ticks || 0;
+            await setTicks(combatant, current + newTick, newTick);
         }
         else if (ev)
         {
@@ -79,3 +128,5 @@ export class TimelineApp extends Application
     }
     
 };
+
+

@@ -1,13 +1,17 @@
 
-export async function setTicks(combatant, value = 0)
+export async function setTicks(combatant, value = 0, ffwd = 0)
 {
     await combatant.setFlag('tick-combat', 'ticks', value);
+    if (ffwd)
+        await combatant.setFlag('tick-combat', 'ffwd', ffwd);
     await game.combat?.setInitiative(combatant.id, value);
 }
 
 export async function normalizeTicks()
 {
     const sorted = await getList();
+    if (!sorted.length)
+        return;
     const normalize = sorted[0].ticks;
     for (const c of sorted)
     {
@@ -39,13 +43,7 @@ export async function getList()
     
     let result = [];
     for (const combatant of combatants) {
-        result.push({
-            id : combatant._id,
-            combatant: combatant,
-            name : combatant.name,
-            isEvent : false,
-            ticks : await combatant.getFlag('tick-combat', 'ticks')
-        });
+        result.push(await getCombatantInfo(combatant));
     };
 
     let events = game.combat?.getFlag('tick-combat', 'events') || [];
@@ -55,11 +53,23 @@ export async function getList()
     return timelineItems.sort((a, b) => a.ticks - b.ticks);
 }
 
+export async function getCombatantInfo(combatant) {
+    return {
+        id: combatant._id,
+        combatant: combatant,
+        name: combatant.name,
+        isEvent: false,
+        ticks: parseInt(await combatant.getFlag('tick-combat', 'ticks')),
+        ffwd: parseInt(await combatant.getFlag('tick-combat', 'ffwd'))
+    };
+}
+
 export async function addEvent(event)
 {
     const events = await game.combat?.getFlag('tick-combat', 'events') || [];
     event.id = crypto.randomUUID();
     event.isEvent = true;
+    event.ffwd = 8;
     events.push(event);
     await game.combat?.setFlag('tick-combat', 'events', events);
 }

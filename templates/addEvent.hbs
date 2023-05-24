@@ -1,0 +1,16 @@
+<form>
+    <p>
+        Name:<br />
+        <input id="name" type="text" value={{name}} />
+    </p>
+    {{#if isNew}}
+    <p>
+        Start Ticks:<br />
+        <input id="ticks" type="number" value={{ticks}} />
+    </p>
+    {{/if}}
+    <p>
+        Repeat interval Ticks:<br />
+        <input id="ffwd" type="number" value={{ffwd}} />
+    </p>
+</form>

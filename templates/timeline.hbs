@@ -1,16 +1,49 @@
 <form style="display: flex; flex: 1; flex-wrap: nowrap; ">
     {{#each list}}
-        <div class="flexcol" style="justify-content: flex-start; align-items: flex-start; margin-right: 5px;">
-            <h2 style="flex: 0;">{{this.ticks}}</h2>
+        <div class="flexcol" style="justify-content: flex-start; align-items: flex-start; margin-left: 5px; margin-right: 5px; width: 120px;">
+            <div style="flex: 0; margin-bottom: 1em;">
+                <svg width="100%" viewBox="0 0 130 60"  version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+                    <path d="M0,0L100,0L130,30L100,60L0,60L30,30L0,0" style="fill:orange;stroke:black;stroke-width:1px;"/>
+                    <text x="40" y="40" style="font-size: 30px;">{{this.ticks}}</text>
+                </svg>
+            </div>
+            
             {{#each this.items}}
-            <div style="flex: 0;">
-                {{this.name}}<br />
-                <input id={{this.id}} type="number" class="ticks" value={{this.ticks}} style="width: 50px;" />
+            <div style="flex: 0; margin-bottom: 10px; border: 1px solid gray; padding: 8px; border-radius: 4px; width: 100%;">
+                <div data-id={{this.id}} class="name">{{this.name}}</div>
+                {{#if this.isEvent}}
+                    <div style="display: flex; align-items: center;">
+                        <a style="flex: 0; font-size: 12px; padding: 2px; border: 1px solid black; margin-right: 4px;" class="ffwd" data-id={{this.id}}>
+                            <i class="fa fa-arrows-turn-right"></i>
+                        </a>
+                        <a style="flex: 0; font-size: 12px; padding: 2px; border: 1px solid black;" class="delete" data-id={{this.id}}>
+                            <i class="fa fa-trash"></i>
+                        </a>
+                    </div>
+
+                    <!--span style="margin-left: 5px;" data-id={{this.id}} class="ffwd"><i class="fa fa-arrows-turn-right"></i></span>
+                    <span style="margin-left: 5px;" data-id={{this.id}} class="delete"><i class="fa fa-trash"></i></span>
+                    <br />
+                    <input id={{this.id}} type="number" class="ticks" value={{this.ticks}} style="width: 45%;" />
+                    <input data-id={{this.id}} type="number" class="diff" value="15" style="width: 45%;" /-->
+                {{else}}
+                    
+                    <div style="display: flex; align-items: center;">
+                        <span style="margin-right: 4px;">+</span>
+                        <input data-id={{this.id}} type="number" class="ticks" value={{this.ffwd}} />
+                        <!--a style="flex: 0; font-size: 12px; padding: 2px; border: 1px solid black; margin-left: 4px;" data-id={{this.id}} class="ffwd">
+                            <i class="fa fa-arrows-turn-right"></i>
+                        </a-->
+                    </div>
+                {{/if}}
             </div>
             {{/each}}
         </div>
     {{/each}}
-    <!--div class="flexcol" style="border: 2px solid lime; margin-right: 1em; width: 4ex;">
-        <button id="addEventButton">+</button>
-    </div-->
 </form>
+
+
+
+
+
+
