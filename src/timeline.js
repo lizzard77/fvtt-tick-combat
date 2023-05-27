@@ -81,10 +81,21 @@ export class TimelineApp extends Application
 
     async _editItem(event) {
         event.preventDefault();
+        const combatant = getCombatant(event.currentTarget.dataset.id);
         const ev = await getEventById(event.currentTarget.dataset.id);
-        if (ev)
+        if (combatant)
         {
-            await editEvent(ev);
+            const current = await getCombatantInfo(combatant);
+            await editEvent(current, async (d) => {
+                await setTicks(combatant, d.ticks);
+                await normalizeTicks();
+            });
+        } else if (ev)
+        {
+            await editEvent(ev, async (d) => {
+                d.isNew ? await addEvent(d) : await updateEvent(d);
+                await normalizeTicks();
+            });
         }
     }
 

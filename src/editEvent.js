@@ -1,9 +1,11 @@
 import { addEvent, normalizeTicks, updateEvent } from "./data.js";
 
-export async function editEvent(data) {
+export async function editEvent(data, fn) {
     const isNew = !data.hasOwnProperty("id");
     data.isNew = isNew;
+    
     const myContent = await renderTemplate("modules/tick-combat/templates/addEvent.hbs", data);
+    
     new Dialog({
         title: isNew ? "New Event" : "Edit Event",
         content: myContent,
@@ -17,8 +19,8 @@ export async function editEvent(data) {
                     if (html.find("#ticks").val())
                         data.ticks = parseInt(html.find("#ticks").val());
                     data.ffwd = parseInt(html.find("#ffwd").val());
-                    isNew ? await addEvent(data) : await updateEvent(data);
-                    await normalizeTicks();
+                    if (fn) 
+                        fn(data);
                 }
             }
         }

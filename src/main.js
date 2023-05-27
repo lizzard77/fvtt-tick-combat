@@ -44,7 +44,7 @@ Hooks.on("deleteCombat", async (combat, options, userId) => {
  * Create Combatant hook
  */
 Hooks.on("createCombatant", async (combatant, options, userId) => {
-    await setTicks(combatant, 1);
+    await setTicks(combatant, 0);
     game.timeline.app.render(true);    
 });
 

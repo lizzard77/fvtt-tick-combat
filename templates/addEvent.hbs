@@ -8,9 +8,16 @@
         Start Ticks:<br />
         <input id="ticks" type="number" value={{ticks}} />
     </p>
+    {{else}}
+    <p>
+        Current Ticks:<br />
+        <input id="ticks" type="number" value={{ticks}} />
+    </p>
     {{/if}}
+    {{#if isEvent}}
     <p>
         Repeat interval Ticks:<br />
         <input id="ffwd" type="number" value={{ffwd}} />
     </p>
+    {{/if}}
 </form>

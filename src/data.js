@@ -1,10 +1,11 @@
 
 export async function setTicks(combatant, value = 0, ffwd = 0)
 {
+    await combatant.unsetFlag('tick-combat', 'ffwd');
     await combatant.setFlag('tick-combat', 'ticks', value);
-    if (ffwd)
-        await combatant.setFlag('tick-combat', 'ffwd', ffwd);
-    await game.combat?.setInitiative(combatant.id, value);
+    //if (ffwd)
+    //    await combatant.setFlag('tick-combat', 'ffwd', ffwd);
+    //await game.combat?.setInitiative(combatant.id, value);
 }
 
 export async function normalizeTicks()
