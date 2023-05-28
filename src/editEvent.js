@@ -4,7 +4,7 @@ export async function editEvent(data, fn) {
     const isNew = !data.hasOwnProperty("id");
     data.isNew = isNew;
     
-    const content = await renderTemplate("modules/tick-combat/templates/addEvent.hbs", data);
+    const content = await renderTemplate("modules/tick-combat/templates/editEvent.hbs", data);
     const title = data.isEvent ? 
         (isNew ? "New Event" : "Edit Event") : 
         (isNew ? "New Actor" : "Edit Actor");
