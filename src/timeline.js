@@ -1,4 +1,4 @@
-import { getCombatant, getEventById, getList, getCombatantInfo, normalizeTicks, removeEvent, setTicks, updateEvent } from "./data.js";
+import { getCombatant, getEventById, getList, getCombatantInfo, normalizeTicks, removeEvent, setTicks, updateEvent, addEvent, setNote, toggleWaiting, toggleHideEvent } from "./data.js";
 import { editEvent } from "./editEvent.js";
 
 Hooks.on("getApplicationHeaderButtons", async (app, buttons) => {
@@ -12,10 +12,16 @@ Hooks.on("getApplicationHeaderButtons", async (app, buttons) => {
             onclick: async () => {
                 const data = {
                     name: "New Event",
+                    isEvent : true,
                     ticks: 100,
-                    ffwd: 1
+                    ffwd: 1,
+                    repeating : true,
+                    notes : ""
                 };
-                await editEvent(data);
+                await editEvent(data, async (d) => {
+                    d.isNew ? await addEvent(d) : await updateEvent(d);
+                    await normalizeTicks();
+                });
             }
         });
     }
@@ -26,23 +32,28 @@ export class TimelineApp extends Application
     static get defaultOptions() 
     {
         const defaults = super.defaultOptions;
+        let width = getList().length*100;
         const overrides = {
             height: 'auto',
-            width: 'auto',
+            resizable : false,
             id: 'timeline-app',
             template: `modules/tick-combat/templates/timeline.hbs`,
             title: 'Timeline',
-            popOut: true,
-            resizable: true,
+            popOut: true
         };
-
         const mergedOptions = foundry.utils.mergeObject(defaults, overrides);
         return mergedOptions;
-    };
+    }
+
+    async setPosition({left, top, height, scale} = {})
+    {
+        let width = (await this.getData()).list.length * 120;
+        super.setPosition({left, top, width, height, scale});
+    }
 
     async getData() 
     {
-        const list = await getList();
+        const list = getList();
         let final = [];
         for (const ev of list) 
         {
@@ -56,31 +67,28 @@ export class TimelineApp extends Application
             }
         }
 
-        this.width = final.length * 150;
-
         return {
-            list : final
+            list : final,
+            isGM : game.user.isGM
         }
     };
 
     activateListeners(html) 
     {
         super.activateListeners(html);
-        html.on('click', "#removeEventButton", this._handleRemoveEvent.bind(this));
         html.on('blur', "input.ticks", this._handleChangeTicks.bind(this));
-        html.on('click', ".name", this._editItem.bind(this));
-        html.on('click', ".ffwd", this._ffwdEvent.bind(this));
-        html.on('click', ".delete", this._deleteEvent.bind(this));
+        html.on('keydown', "input.ticks", this._handleEnterKey.bind(this));
+        html.on('click', ".name", this._handleEditItem.bind(this));
+        html.on('click', ".ffwd", this._handleffwdButton.bind(this));
+        html.on('click', ".delete", this._handleDeleteButton.bind(this));
+        html.on('click', ".wait", this._handleWaitToggleButton.bind(this));
+        html.on('click', ".hide", this._handleHideToggleButton.bind(this));
     };
 
-    async _handleRemoveEvent(event) {
+    async _handleEditItem(event) {
         event.preventDefault();
-        await removeEvent(event.currentTarget.id);
-        await normalizeTicks();
-    }
-
-    async _editItem(event) {
-        event.preventDefault();
+        if (!game.user.isGM)
+            return;
         const combatant = getCombatant(event.currentTarget.dataset.id);
         const ev = await getEventById(event.currentTarget.dataset.id);
         if (combatant)
@@ -88,6 +96,7 @@ export class TimelineApp extends Application
             const current = await getCombatantInfo(combatant);
             await editEvent(current, async (d) => {
                 await setTicks(combatant, d.ticks);
+                await setNote(combatant, d.notes);
                 await normalizeTicks();
             });
         } else if (ev)
@@ -99,19 +108,50 @@ export class TimelineApp extends Application
         }
     }
 
-    async _ffwdEvent(event) {
+    async _handleffwdButton(event) {
         event.preventDefault();
+        if (!game.user.isGM)
+            return;
         const ev = await getEventById(event.currentTarget.dataset.id);
         if (ev)
         {
-            ev.ticks = ev.ticks + ev.ffwd;
-            await updateEvent(ev);
+            if (ev.ffwd > 0)
+            {
+                ev.ticks = ev.ticks + ev.ffwd;
+                await updateEvent(ev);
+            } else {
+                await removeEvent(ev);
+            }
             await normalizeTicks();
         }
     }
 
-    async _deleteEvent(event) {
+    async _handleWaitToggleButton(event) {
         event.preventDefault();
+        const combatant = getCombatant(event.currentTarget.dataset.id);
+        if (combatant)
+        {
+            const current = getCombatantInfo(combatant).ticks || 0;
+            await toggleWaiting(combatant);
+            await normalizeTicks();
+        }
+    }
+
+    async _handleHideToggleButton(event) {
+        event.preventDefault();
+        if (!game.user.isGM)
+            return;
+        const ev = await getEventById(event.currentTarget.dataset.id);
+        if (ev)
+        {
+            await toggleHideEvent(ev);
+        }
+    }
+
+    async _handleDeleteButton(event) {
+        event.preventDefault();
+        if (!game.user.isGM)
+            return;
         const ev = await getEventById(event.currentTarget.dataset.id);
         if (ev)
         {
@@ -120,14 +160,29 @@ export class TimelineApp extends Application
         }
     }
 
+    async _handleEnterKey(event)
+    {
+        if (event.key === "Enter")
+        {
+            event.preventDefault();
+            this._handleChangeTicks(event);
+        }
+    }
+
     async _handleChangeTicks(event) {
+        event.preventDefault();
+        if (!game.user.isGM)
+            return;
         const newTick = parseInt(event.currentTarget.value);
+        if (!newTick)
+            return;
+
         const combatant = getCombatant(event.currentTarget.dataset.id);
         const ev = await getEventById(event.currentTarget.dataset.id);
 
         if (combatant)
         {
-            const current = (await getCombatantInfo(combatant)).ticks || 0;
+            const current = getCombatantInfo(combatant).ticks || 0;
             await setTicks(combatant, current + newTick, newTick);
         }
         else if (ev)
@@ -137,7 +192,6 @@ export class TimelineApp extends Application
         }
         await normalizeTicks();
     }
-    
 };
 
 

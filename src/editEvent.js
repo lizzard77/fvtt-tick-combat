@@ -4,11 +4,14 @@ export async function editEvent(data, fn) {
     const isNew = !data.hasOwnProperty("id");
     data.isNew = isNew;
     
-    const myContent = await renderTemplate("modules/tick-combat/templates/addEvent.hbs", data);
+    const content = await renderTemplate("modules/tick-combat/templates/addEvent.hbs", data);
+    const title = data.isEvent ? 
+        (isNew ? "New Event" : "Edit Event") : 
+        (isNew ? "New Actor" : "Edit Actor");
     
     new Dialog({
-        title: isNew ? "New Event" : "Edit Event",
-        content: myContent,
+        title,
+        content: content,
         default: "one",
         buttons: {
             one: {
@@ -16,9 +19,11 @@ export async function editEvent(data, fn) {
                 label: "OK",
                 callback: async (html) => {
                     data.name = html.find("#name").val();
+                    data.notes = html.find("#notes").val();
                     if (html.find("#ticks").val())
                         data.ticks = parseInt(html.find("#ticks").val());
                     data.ffwd = parseInt(html.find("#ffwd").val());
+                    data.repeating = html.find("#repeating").prop("checked")
                     if (fn) 
                         fn(data);
                 }

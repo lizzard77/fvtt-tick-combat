@@ -1,23 +1,30 @@
 <form>
     <p>
         Name:<br />
-        <input id="name" type="text" value={{name}} />
+        <input id="name" type="text" value="{{name}}" />
+    </p>
+    <p>
+        Notes: <br />
+        <textarea style="height: 3ex; resize: none;" id="notes">{{notes}}</textarea>
     </p>
     {{#if isNew}}
     <p>
         Start Ticks:<br />
-        <input id="ticks" type="number" value={{ticks}} />
+        <input id="ticks" type="number" value="{{ticks}}" style="flex: 0;" />
     </p>
     {{else}}
     <p>
         Current Ticks:<br />
-        <input id="ticks" type="number" value={{ticks}} />
+        <input id="ticks" type="number" value="{{ticks}}" />
     </p>
     {{/if}}
     {{#if isEvent}}
     <p>
-        Repeat interval Ticks:<br />
-        <input id="ffwd" type="number" value={{ffwd}} />
+        <input type="checkbox" id="repeating" {{#if repeating}}checked{{/if}} /> is repeating event
+    </p>
+    <p>
+        Repeat interval Ticks (if repeating event):<br />
+        <input id="ffwd" type="number" value="{{ffwd}}" />
     </p>
     {{/if}}
 </form>

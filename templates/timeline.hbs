@@ -1,7 +1,7 @@
-<form style="display: flex; flex: 1; flex-wrap: nowrap; ">
+<form style="display: flex; flex-wrap: nowrap; width: 100%;">
     {{#each list}}
         <div class="flexcol" style="justify-content: flex-start; align-items: flex-start; margin-left: 5px; margin-right: 5px; width: 120px;">
-            <div style="flex: 0; height: 100px; margin-bottom: 1em;">
+            <div style="flex: 0; width: 100%; margin-bottom: 1em;">
                 <svg width="100%" viewBox="0 0 130 60"  version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
                     <path d="M0,30L30,0L130,0L100,30L130,60L30,60L0,30" style="fill:orange;stroke:black;stroke-width:1px;"/>
                     <text x="40" y="40" style="font-size: 30px;">{{this.ticks}}</text>
@@ -10,31 +10,77 @@
             
             {{#each this.items}}
             <div style="flex: 0; margin-bottom: 10px; border: 1px solid gray; padding: 8px; border-radius: 4px; width: 100%;">
-                <div data-id={{this.id}} class="name">{{this.name}}</div>
+                
+                <div data-id={{this.id}} class="name" title="{{this.notes}}">{{this.name}}</div>
+
                 {{#if this.isEvent}}
+                    {{#if ../../isGM}}
                     <div style="display: flex; align-items: center;">
+                        {{# if this.repeating}}
                         <a style="flex: 0; font-size: 12px; padding: 2px; border: 1px solid black; margin-right: 4px;" class="ffwd" data-id={{this.id}}>
-                            <i class="fa fa-arrows-turn-right"></i>
+                            <nobr>{{this.ffwd}} <i class="fa fa-arrows-turn-right"></i></nobr>
                         </a>
+                        {{else}}
+                        <a style="flex: 0; font-size: 12px; padding: 2px; border: 1px solid black; margin-right: 4px;" class="ffwd" data-id={{this.id}}>
+                            <i class="fa fa-check"></i>
+                        </a>
+                        {{/if}}
+
                         <a style="flex: 0; font-size: 12px; padding: 2px; border: 1px solid black;" class="delete" data-id={{this.id}}>
                             <i class="fa fa-trash"></i>
                         </a>
+
+                        {{#if this.isHidden}}
+                        <a style="flex: 0; font-size: 12px; padding: 2px; border: 1px solid black; margin-left: 4px;" class="hide" data-id={{this.id}}>
+                            <i class="fa fa-eye-slash"></i>
+                        </a>
+                        {{else}}
+                        <a style="flex: 0; font-size: 12px; padding: 2px; border: 1px solid black; margin-left: 4px;" class="hide" data-id={{this.id}}>
+                            <i class="fa fa-eye"></i>
+                        </a>
+                        {{/if}}
+                    </div>
+                    {{/if}}
+
+                {{else}}
+
+                    <div style="display: flex; align-items: center;">
+                        {{#if ../../isGM}}
+                            <span style="margin-right: 4px;">+</span>
+                            <input data-id={{this.id}} type="number" class="ticks" value={{this.ffwd}} />
+                        {{else}}
+                            {{#if this.canWait}}
+                                <div style="margin-top: 8px; width: 100%; display: flex;">
+                                {{#if this.isWaiting}}
+                                    <a style="flex: 1; font-size: 12px; padding: 2px; border: 1px solid black;" class="wait" data-id={{this.id}} title="Continue">
+                                        <i class="fa fa-play"></i> Wartet
+                                    </a>
+                                {{else}}
+                                    <a style="flex: 1; font-size: 12px; padding: 2px; border: 1px solid black;" class="wait" data-id={{this.id}} title="Wait">
+                                        <i class="fa fa-pause"></i> Warten
+                                    </a>
+                                {{/if}}
+                                </div>
+                            {{/if}}
+                        {{/if}}
                     </div>
 
-                    <!--span style="margin-left: 5px;" data-id={{this.id}} class="ffwd"><i class="fa fa-arrows-turn-right"></i></span>
-                    <span style="margin-left: 5px;" data-id={{this.id}} class="delete"><i class="fa fa-trash"></i></span>
-                    <br />
-                    <input id={{this.id}} type="number" class="ticks" value={{this.ticks}} style="width: 45%;" />
-                    <input data-id={{this.id}} type="number" class="diff" value="15" style="width: 45%;" /-->
-                {{else}}
-                    
-                    <div style="display: flex; align-items: center;">
-                        <span style="margin-right: 4px;">+</span>
-                        <input data-id={{this.id}} type="number" class="ticks" value={{this.ffwd}} />
-                        <!--a style="flex: 0; font-size: 12px; padding: 2px; border: 1px solid black; margin-left: 4px;" data-id={{this.id}} class="ffwd">
-                            <i class="fa fa-arrows-turn-right"></i>
-                        </a-->
-                    </div>
+                    {{#if ../../isGM}}
+                        {{#if this.canWait}}
+                            <div style="margin-top: 8px; width: 100%; display: flex;">
+                                {{#if this.isWaiting}}
+                                    <a style="flex: 1; font-size: 12px; padding: 2px; border: 1px solid black;" class="wait" data-id={{this.id}} title="Continue">
+                                        <i class="fa fa-play"></i> Wartet
+                                    </a>
+                                {{else}}
+                                    <a style="flex: 1; font-size: 12px; padding: 2px; border: 1px solid black;" class="wait" data-id={{this.id}} title="Wait">
+                                        <i class="fa fa-pause"></i> Warten
+                                    </a>
+                                {{/if}}
+                            </div>
+                        {{/if}}
+                    {{/if}}
+
                 {{/if}}
             </div>
             {{/each}}
