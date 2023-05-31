@@ -3,6 +3,9 @@ import { editEvent } from "./editEvent.js";
 
 Hooks.on("getApplicationHeaderButtons", async (app, buttons) => {
 
+    if (!game.user.isGM)
+        return;
+        
     if (app.id === "timeline-app")
     {
         buttons.unshift({

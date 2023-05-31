@@ -1,16 +1,15 @@
-import { clearEvents, setTicks } from "./data.js";
+import { clearEvents, getList, setTicks } from "./data.js";
 import { TimelineApp } from "./timeline.js";
 
 Hooks.on('ready', async () => {
     game.timeline = {
         app : new TimelineApp()
     }
-    if (game.combat.isActive)
-        game.timeline.app.render(true);
+    updateAppWindow();
 });
 
 Hooks.on('renderCombatTracker', (app, html, data) => {
-    const actionButtons = html.find('.encounters');
+    const actionButtons = html.find('.combat-tracker-header');
     const myButton = '<div class="flexrow"><button id="embedButton"><i class="fas fa-sword"></i>Show Timeline</button></div>';
     actionButtons.append(myButton);
     html.find("#embedButton").on('click', () => {
@@ -19,11 +18,11 @@ Hooks.on('renderCombatTracker', (app, html, data) => {
 });
 
 Hooks.on("createCombat", async (combat, createData, options, userId) => {
-    game.timeline.app.render(true);
+    updateAppWindow();
 });
 
 Hooks.on("updateCombat", async (combat, update, options, userId) => {
-    game.timeline.app.render(true);
+    updateAppWindow();
 });
 
 Hooks.on("deleteCombat", async (combat, options, userId) => {
@@ -32,22 +31,34 @@ Hooks.on("deleteCombat", async (combat, options, userId) => {
 });
 
 Hooks.on("createCombatant", async (combatant, options, userId) => {
-    await setTicks(combatant, 0);
-    game.timeline.app.render(true);    
+    if (game.user.isGM)
+        await setTicks(combatant, 0);
+    updateAppWindow();
 });
 
 Hooks.on("updateCombatant", async (combatant, updateData, options, userId) => {
-    game.timeline.app.render(true);
+    updateAppWindow();
 });
 
 Hooks.on("deleteCombatant", (combatant, options, userId) => {
-    game.timeline.app.render(true);
+    updateAppWindow();
 });
 
 Hooks.on("updateActor", (actor, updateData, options, userId) => {
-    game.timeline.app.render(true);
+    updateAppWindow();
 });
 
 Hooks.on("updateToken", (token, updateData, options, userId) => {
-    game.timeline.app.render(true);
+    updateAppWindow();
 });
+
+function updateAppWindow() 
+{
+    const list = getList();
+    if (list.length == 0)
+        game.timeline.app.close();
+
+    else
+        game.timeline.app.render(true);
+}
+
