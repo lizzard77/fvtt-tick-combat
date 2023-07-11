@@ -39,6 +39,7 @@ export class TimelineApp extends Application
         const overrides = {
             height: 'auto',
             resizable : false,
+            
             id: 'timeline-app',
             template: `modules/tick-combat/templates/timeline.hbs`,
             title: 'Timeline',
