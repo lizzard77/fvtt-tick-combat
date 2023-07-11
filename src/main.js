@@ -6,6 +6,15 @@ Hooks.on('ready', async () => {
         app : new TimelineApp()
     }
     updateAppWindow();
+    /*
+    ClientKeybindings._onDismiss = context => {
+        // Save fog of war if there are pending chan
+        Object.values(ui.windows).forEach(app => {
+            if (app.options.minimizable)
+               app.minimize();
+         });
+    };
+    */
 });
 
 Hooks.on('renderCombatTracker', (app, html, data) => {
@@ -51,6 +60,8 @@ Hooks.on("updateActor", (actor, updateData, options, userId) => {
 Hooks.on("updateToken", (token, updateData, options, userId) => {
     updateAppWindow();
 });
+
+
 
 function updateAppWindow() 
 {
