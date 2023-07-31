@@ -6,6 +6,15 @@
         {
             "label": "run Foundry 11",
             "type": "shell",
+            "command": "node resources/app/main.js --dataPath=/projects/foundry-dev11",
+            "options": {
+                "cwd": "c:\\projects\\foundry11"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Surface - run Foundry 11",
+            "type": "shell",
             "command": "node resources/app/main.js --dataPath=/p/foundry-dev11",
             "options": {
                 "cwd": "c:\\p\\foundry11"

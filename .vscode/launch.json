@@ -11,7 +11,7 @@
             "url": "http://localhost:30000",
             "webRoot": "${workspaceFolder}",
             "pathMapping": {
-                "http://localhost:30000/modules/tick-combat/": "C:/p/foundry-dev11/Data/modules/tick-combat/"
+                "http://localhost:30000/modules/tick-combat/": "C:/projects/foundry-dev11/Data/modules/tick-combat/"
             }
         }
     ]

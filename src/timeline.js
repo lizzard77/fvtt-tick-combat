@@ -8,6 +8,11 @@ Hooks.on("getApplicationHeaderButtons", async (app, buttons) => {
         
     if (app.id === "timeline-app")
     {
+        //buttons.splice(0,1);
+        buttons[0].onclick = async() => {
+            game.timeline.app.close(true);
+        };
+
         buttons.unshift({
             label: "Add Event",
             class: "addEventButton",
@@ -39,7 +44,6 @@ export class TimelineApp extends Application
         const overrides = {
             height: 'auto',
             resizable : false,
-            
             id: 'timeline-app',
             template: `modules/tick-combat/templates/timeline.hbs`,
             title: 'Timeline',
@@ -47,6 +51,13 @@ export class TimelineApp extends Application
         };
         const mergedOptions = foundry.utils.mergeObject(defaults, overrides);
         return mergedOptions;
+    }
+
+    close(force = false)
+    {
+        // override to prevent closing by default
+        if (force)
+            return super.close();
     }
 
     async setPosition({left, top, height, scale} = {})
