@@ -130,6 +130,9 @@ export class TimelineApp extends Application
             await editEvent(current, async (d) => {
                 await setTicks(combatant, d.ticks);
                 await setNote(combatant, d.notes);
+                await combatant.update({ name : d.name });
+                if (combatant.token)
+                    await combatant.token.update({ name : d.name });
                 await normalizeTicks();
             });
         } else if (ev)
