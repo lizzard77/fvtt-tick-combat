@@ -1,28 +1,29 @@
-
-export async function setTicks(combatant, value = 0, ffwd = 0)
+export async function setTicks(combatant, value = 0)
 {
-    await combatant.setFlag('tick-combat', 'ticks', value);
+    const data = getCombatantData(combatant);   
+    data.ticks = parseInt(value);
     if (value > 0)
-        await combatant.unsetFlag('tick-combat', 'waiting');
-    //if (ffwd)
-    //    await combatant.setFlag('tick-combat', 'ffwd', ffwd);
-    //await game.combat?.setInitiative(combatant.id, value);
+        data.isWaiting = false;
+    await setCombatantData(combatant, data);
 }
 
 export async function setNote(combatant, value = "")
 {
-    await combatant.setFlag('tick-combat', 'notes', value);
+    const data = getCombatantData(combatant);   
+    data.notes = value;
+    await setCombatantData(combatant, data);
 }
 
 export async function toggleWaiting(combatant)
 {
-    const currentState = combatant.getFlag('tick-combat', 'waiting') || false;
-    await combatant.setFlag('tick-combat', 'waiting', !currentState);
+    const data = getCombatantData(combatant);   
+    data.isWaiting = !data.isWaiting;
+    await setCombatantData(combatant, data);
 }
 
 export async function normalizeTicks()
 {
-    const sorted = getList();
+    const sorted = getCombatantAndEventsList();
     if (!sorted.length)
         return;
 
@@ -55,7 +56,7 @@ export function getCombatant(id)
     return combatants.find(c => c._id === id);
 }
 
-export function getList()
+export function getCombatantAndEventsList()
 {
     let combatants = game.combat?.combatants;
     if (!combatants)
@@ -67,7 +68,7 @@ export function getList()
             result.push(getCombatantInfo(combatant));
     };
 
-    let events = game.combat?.getFlag('tick-combat', 'events') || [];
+    let events = getEvents();
 
     if (!game.user.isGM)
         events = events.filter(e => !e.isHidden);
@@ -79,22 +80,32 @@ export function getList()
 }
 
 export function getCombatantInfo(combatant) {
+    const data = getCombatantData(combatant);
     return {
         id: combatant._id,
         combatant: combatant,
         name: combatant.name,
         isEvent: false,
-        ticks: parseInt(combatant.getFlag('tick-combat', 'ticks')),
-        canWait : (combatant.hasPlayerOwner || game.user.isGM) && parseInt(combatant.getFlag('tick-combat', 'ticks')) === 0,
-        isWaiting: combatant.getFlag('tick-combat', 'waiting') || false,
-        notes : combatant.getFlag('tick-combat', 'notes') || "",
-        ffwd: parseInt(combatant.getFlag('tick-combat', 'ffwd'))
+        ticks: data.ticks,
+        canWait : (combatant.hasPlayerOwner || game.user.isGM) && data.ticks === 0,
+        isWaiting: data.isWaiting,
+        notes : data.notes,
+        ffwd: data.ffwd
     };
+}
+
+function getCombatantData(combatant) {
+    const str = combatant.getFlag('tick-combat', 'data') || '{ "ticks": 0, "isWaiting": false, "notes": "", "ffwd": 0 }';
+    return JSON.parse(str);
+}
+
+async function setCombatantData(combatant, data) {
+    await combatant.setFlag('tick-combat', 'data', JSON.stringify(data));
 }
 
 export async function addEvent(event)
 {
-    const events = await game.combat?.getFlag('tick-combat', 'events') || [];
+    const events = await getEvents();
     event.id = crypto.randomUUID();
     event.isEvent = true;
     if (!event.ffwd)
@@ -102,33 +113,28 @@ export async function addEvent(event)
     if (!event.repeating)
         event.ffwd = -1;
     events.push(event);
-    await game.combat?.setFlag('tick-combat', 'events', events);
+    await setEvents(events);
 }
 
 export async function removeEvent(event)
 {
-    const events = await game.combat?.getFlag('tick-combat', 'events') || [];
+    const events = await getEvents();
     const index = events.indexOf(events.find(e => e.id === event.id));
     if (index > -1) {
         events.splice(index, 1);
-        await game.combat?.setFlag('tick-combat', 'events', events);
+        await setEvents(events);
     }
-}
-
-export async function clearEvents()
-{
-    await game.combat?.unsetFlag('tick-combat', 'events');
 }
 
 export async function updateEvent(event)
 {
-    const events = await game.combat?.getFlag('tick-combat', 'events') || [];
+    const events = await getEvents();
     const index = events.indexOf(events.find(e => e.id === event.id));
     if (index > -1) {
         if (!event.repeating)
            event.ffwd = -1;
         events[index] = event;
-        await game.combat?.setFlag('tick-combat', 'events', events);
+        await setEvents(events);
     }
 }
 
@@ -140,6 +146,23 @@ export async function toggleHideEvent(event)
 
 export async function getEventById(id)
 {
-    const events = await game.combat?.getFlag('tick-combat', 'events') || [];
+    const events = await getEvents();
     return events.find(e => e.id === id);
 }
+
+export function getEvents()
+{
+    const events = game.combat?.getFlag('tick-combat', 'events') || [];
+    return events;
+}
+
+export async function setEvents(events)
+{
+    await game.combat?.setFlag('tick-combat', 'events', events);   
+}
+
+export async function clearEvents()
+{
+    await game.combat?.unsetFlag('tick-combat', 'events');
+}
+

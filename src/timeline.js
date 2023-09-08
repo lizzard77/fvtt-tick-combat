@@ -1,4 +1,4 @@
-import { getCombatant, getEventById, getList, getCombatantInfo, normalizeTicks, removeEvent, setTicks, updateEvent, addEvent, setNote, toggleWaiting, toggleHideEvent } from "./data.js";
+import { getCombatant, getEventById, getCombatantAndEventsList, getCombatantInfo, normalizeTicks, removeEvent, setTicks, updateEvent, addEvent, setNote, toggleWaiting, toggleHideEvent } from "./data.js";
 import { editEvent } from "./editEvent.js";
 
 Hooks.on("getApplicationHeaderButtons", async (app, buttons) => {
@@ -40,9 +40,11 @@ export class TimelineApp extends Application
     static get defaultOptions() 
     {
         const defaults = super.defaultOptions;
-        let width = getList().length*100;
+        let width = getCombatantAndEventsList().length*100;
         const overrides = {
             height: 'auto',
+            width: 'auto',
+            scale: 1.2,
             resizable : false,
             id: 'timeline-app',
             template: `modules/tick-combat/templates/timeline.hbs`,
@@ -68,7 +70,7 @@ export class TimelineApp extends Application
 
     async getData() 
     {
-        const list = getList();
+        const list = getCombatantAndEventsList();
         let final = [];
         for (const ev of list) 
         {

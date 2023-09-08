@@ -1,4 +1,4 @@
-import { clearEvents, getList, setTicks } from "./data.js";
+import { clearEvents, getCombatantAndEventsList, setTicks } from "./data.js";
 import { TimelineApp } from "./timeline.js";
 
 Hooks.on('ready', async () => {
@@ -22,6 +22,7 @@ Hooks.on("createCombat", async (combat, createData, options, userId) => {
 });
 
 Hooks.on("updateCombat", async (combat, update, options, userId) => {
+    console.log("updateCombat");
     updateAppWindow();
 });
 
@@ -37,6 +38,7 @@ Hooks.on("createCombatant", async (combatant, options, userId) => {
 });
 
 Hooks.on("updateCombatant", async (combatant, updateData, options, userId) => {
+    console.log("updateCombatant");
     updateAppWindow();
 });
 
@@ -56,7 +58,7 @@ Hooks.on("updateToken", (token, updateData, options, userId) => {
 
 function updateAppWindow() 
 {
-    const list = getList();
+    const list = getCombatantAndEventsList();
     if (list.length == 0)
         game.timeline.app.close(true);
 
