@@ -1,6 +1,20 @@
 import { clearEvents, getCombatantAndEventsList, setTicks } from "./data.js";
 import { TimelineApp } from "./timeline.js";
 
+Hooks.on('init', () => {
+    game.settings.register("tick-combat", "scale", {
+        name: "Skalierung",
+        label: "Timeline-Skalierung",
+        scope: "client",
+        type: Number,
+        default: 1.0,
+        config: true,
+        onChange: () => {
+            game.timeline.app.setPosition();
+        }
+    });
+});
+
 Hooks.on('ready', async () => {
     game.timeline = {
         app : new TimelineApp()
@@ -60,9 +74,10 @@ function updateAppWindow()
 {
     const list = getCombatantAndEventsList();
     if (list.length == 0)
+    {
         game.timeline.app.close(true);
-
-    else
+    } else {
         game.timeline.app.render(true);
+    }
 }
 

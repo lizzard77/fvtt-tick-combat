@@ -14,6 +14,17 @@ Hooks.on("getApplicationHeaderButtons", async (app, buttons) => {
         };
 
         buttons.unshift({
+            class: "scaleButton",
+            icon: "fas fa-magnifying-glass",
+            onclick: async () => {
+                let scale = (game.settings.get("tick-combat", "scale") || 1.0)+0.25;
+                if (scale > 1.5)
+                    scale = 0.75;
+                game.settings.set("tick-combat", "scale", scale);
+            }
+        });
+
+        buttons.unshift({
             label: "Add Event",
             class: "addEventButton",
             icon: "fas fa-plus",
@@ -40,11 +51,12 @@ export class TimelineApp extends Application
     static get defaultOptions() 
     {
         const defaults = super.defaultOptions;
-        let width = getCombatantAndEventsList().length*100;
+        const scale = game.settings.get("tick-combat", "scale");
+        
         const overrides = {
             height: 'auto',
             width: 'auto',
-            scale: 1.2,
+            scale,
             resizable : false,
             id: 'timeline-app',
             template: `modules/tick-combat/templates/timeline.hbs`,
@@ -62,9 +74,10 @@ export class TimelineApp extends Application
             return super.close();
     }
 
-    async setPosition({left, top, height, scale} = {})
+    async setPosition({left, top, height} = {})
     {
         let width = (await this.getData()).list.length * 120;
+        const scale = game.settings.get("tick-combat", "scale");
         super.setPosition({left, top, width, height, scale});
     }
 
@@ -84,9 +97,12 @@ export class TimelineApp extends Application
             }
         }
 
+        const scale = game.settings.get("tick-combat", "scale");
+
         return {
             list : final,
-            isGM : game.user.isGM
+            isGM : game.user.isGM,
+            scale
         }
     };
 
