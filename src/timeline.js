@@ -125,6 +125,19 @@ export class TimelineApp extends Application
 
     async _handleEditItem(event) {
         event.preventDefault();
+
+        if (event.shiftKey) 
+        {
+            //console.log(game.canvas.layers);
+            const combatant = getCombatant(event.currentTarget.dataset.id);
+            if (combatant?.token)
+            {
+                const offset = game.scenes.current?.grid?.size / 2 || 0;
+                await game.canvas.ping({ x: combatant.token.x + offset, y: combatant.token.y + offset }, { duration: 3000 });
+            }
+            return;
+        }
+
         if (!game.user.isGM)
             return;
         const combatant = getCombatant(event.currentTarget.dataset.id);
