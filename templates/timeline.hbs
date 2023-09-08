@@ -1,4 +1,5 @@
 <form style="display: flex; flex-wrap: nowrap; width: 100%;" id="timelineWrapper">
+    <div style="margin: 0; width: 60px; background-color: lightslategrey; color: white; padding: 4px;">Total: <br />{{totalTicks}}</div>
     {{#each list}}
         <div class="flexcol" style="justify-content: flex-start; align-items: flex-start; margin-left: 5px; margin-right: 5px; width: 120px;">
             <div style="flex: 0; width: 100%; margin-bottom: 1em;">
@@ -41,9 +42,7 @@
                         {{/if}}
                     </div>
                     {{/if}}
-
                 {{else}}
-
                     <div style="display: flex; align-items: center;">
                         {{#if ../../isGM}}
                             <span style="margin-right: 4px;">+</span>

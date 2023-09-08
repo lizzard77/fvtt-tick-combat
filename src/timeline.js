@@ -2,10 +2,6 @@ import { getCombatant, getEventById, getCombatantAndEventsList, getCombatantInfo
 import { editEvent } from "./editEvent.js";
 
 Hooks.on("getApplicationHeaderButtons", async (app, buttons) => {
-
-    if (!game.user.isGM)
-        return;
-        
     if (app.id === "timeline-app")
     {
         //buttons.splice(0,1);
@@ -24,25 +20,28 @@ Hooks.on("getApplicationHeaderButtons", async (app, buttons) => {
             }
         });
 
-        buttons.unshift({
-            label: "Add Event",
-            class: "addEventButton",
-            icon: "fas fa-plus",
-            onclick: async () => {
-                const data = {
-                    name: "New Event",
-                    isEvent : true,
-                    ticks: 100,
-                    ffwd: 1,
-                    repeating : true,
-                    notes : ""
-                };
-                await editEvent(data, async (d) => {
-                    d.isNew ? await addEvent(d) : await updateEvent(d);
-                    await normalizeTicks();
-                });
-            }
-        });
+        if (game.user.isGM)
+        {
+            buttons.unshift({
+                label: "Add Event",
+                class: "addEventButton",
+                icon: "fas fa-plus",
+                onclick: async () => {
+                    const data = {
+                        name: "New Event",
+                        isEvent : true,
+                        ticks: 100,
+                        ffwd: 1,
+                        repeating : true,
+                        notes : ""
+                    };
+                    await editEvent(data, async (d) => {
+                        d.isNew ? await addEvent(d) : await updateEvent(d);
+                        await normalizeTicks();
+                    });
+                }
+            });
+        }
     }
 });
 
@@ -80,7 +79,7 @@ export class TimelineApp extends Application
 
     async setPosition({left, top, height} = {})
     {
-        let width = (await this.getData()).list.length * 120;
+        let width = (await this.getData()).list.length * 120 + 60;
         const scale = game.settings.get("tick-combat", "scale");
         super.setPosition({left, top, width, height, scale});
     }
@@ -102,11 +101,13 @@ export class TimelineApp extends Application
         }
 
         const scale = game.settings.get("tick-combat", "scale");
+        const totalTicks = game.combat?.getFlag('tick-combat', 'totalTicks') || 0;
 
         return {
             list : final,
             isGM : game.user.isGM,
-            scale
+            scale, 
+            totalTicks
         }
     };
 

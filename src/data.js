@@ -32,7 +32,6 @@ export async function normalizeTicks()
         return;
 
     const normalize = onlyActive[0].ticks;
-
     for (const c of onlyActive)
     {
         const newTicks = c.ticks - normalize;
@@ -46,6 +45,10 @@ export async function normalizeTicks()
             await setTicks(c.combatant, newTicks);
         }
     }
+
+    const totalTicks = game.combat?.getFlag('tick-combat', 'totalTicks') || 0;
+    game.combat?.setFlag('tick-combat', 'totalTicks', totalTicks+normalize);
+    console.log("normalizeTicks", totalTicks);
 
     await game.timeline.app.setPosition({});
 }
@@ -165,4 +168,5 @@ export async function clearEvents()
 {
     await game.combat?.unsetFlag('tick-combat', 'events');
 }
+
 
