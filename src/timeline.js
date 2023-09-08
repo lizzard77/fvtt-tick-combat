@@ -109,7 +109,7 @@ export class TimelineApp extends Application
     activateListeners(html) 
     {
         super.activateListeners(html);
-        html.on('blur', "input.ticks", this._handleChangeTicks.bind(this));
+        //html.on('blur', "input.ticks", this._handleChangeTicks.bind(this));
         html.on('keydown', "input.ticks", this._handleEnterKey.bind(this));
         html.on('click', ".name", this._handleEditItem.bind(this));
         html.on('click', ".ffwd", this._handleffwdButton.bind(this));
@@ -167,7 +167,6 @@ export class TimelineApp extends Application
         const combatant = getCombatant(event.currentTarget.dataset.id);
         if (combatant)
         {
-            const current = getCombatantInfo(combatant).ticks || 0;
             await toggleWaiting(combatant);
             await normalizeTicks();
         }
@@ -198,36 +197,29 @@ export class TimelineApp extends Application
 
     async _handleEnterKey(event)
     {
-        if (event.key === "Enter")
+        if (event.key === "Enter" && game.user.isGM)
         {
             event.preventDefault();
-            this._handleChangeTicks(event);
+            const newTick = parseInt(event.currentTarget.value);
+            if (!newTick)
+                return;
+
+            const combatant = getCombatant(event.currentTarget.dataset.id);
+            const ev = await getEventById(event.currentTarget.dataset.id);
+
+            if (combatant)
+            {
+                const current = getCombatantInfo(combatant).ticks || 0;
+                await setTicks(combatant, current + newTick, newTick);
+            }
+            else if (ev)
+            {
+                ev.ticks = newTick;
+                await updateEvent(ev);
+            }
+            await normalizeTicks();
         }
     }
-
-    async _handleChangeTicks(event) {
-        event.preventDefault();
-        if (!game.user.isGM)
-            return;
-        const newTick = parseInt(event.currentTarget.value);
-        if (!newTick)
-            return;
-
-        const combatant = getCombatant(event.currentTarget.dataset.id);
-        const ev = await getEventById(event.currentTarget.dataset.id);
-
-        if (combatant)
-        {
-            const current = getCombatantInfo(combatant).ticks || 0;
-            await setTicks(combatant, current + newTick, newTick);
-        }
-        else if (ev)
-        {
-            ev.ticks = newTick;
-            await updateEvent(ev);
-        }
-        await normalizeTicks();
-    }
-};
+}
 
 

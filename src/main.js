@@ -61,14 +61,9 @@ Hooks.on("deleteCombatant", (combatant, options, userId) => {
 });
 
 Hooks.on("updateActor", (actor, updateData, options, userId) => {
+    console.log("updateActor");
     updateAppWindow();
 });
-
-Hooks.on("updateToken", (token, updateData, options, userId) => {
-    updateAppWindow();
-});
-
-
 
 function updateAppWindow() 
 {
