@@ -1,5 +1,3 @@
-import { addEvent, normalizeTicks, updateEvent } from "./data.js";
-
 export async function editEvent(data, fn) {
     const isNew = !data.hasOwnProperty("id");
     data.isNew = isNew;
