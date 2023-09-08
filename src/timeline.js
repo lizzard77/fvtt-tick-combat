@@ -71,7 +71,11 @@ export class TimelineApp extends Application
     {
         // override to prevent closing by default
         if (force)
+        {
+            if (game.user.isGM)
+                game.combat?.endCombat();
             return super.close();
+        }
     }
 
     async setPosition({left, top, height} = {})

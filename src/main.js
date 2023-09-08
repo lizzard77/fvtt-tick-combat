@@ -32,6 +32,7 @@ Hooks.on('renderCombatTracker', (app, html, data) => {
 });
 
 Hooks.on("createCombat", async (combat, createData, options, userId) => {
+    await clearEvents();
     updateAppWindow();
 });
 
@@ -41,7 +42,7 @@ Hooks.on("updateCombat", async (combat, update, options, userId) => {
 });
 
 Hooks.on("deleteCombat", async (combat, options, userId) => {
-    game.timeline.app.close();
+    game.timeline.app.close(true);
     await clearEvents();
 });
 
@@ -70,8 +71,11 @@ function updateAppWindow()
     const list = getCombatantAndEventsList();
     if (list.length == 0)
     {
-        game.timeline.app.close(true);
+        if (game.timeline.app.rendered)
+            game.timeline.app.close(true);
     } else {
+        if (!game.combat?.started)
+            game.combat?.startCombat();
         game.timeline.app.render(true);
     }
 }
