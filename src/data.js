@@ -46,9 +46,12 @@ export async function normalizeTicks()
         }
     }
 
-    const totalTicks = game.combat?.getFlag('tick-combat', 'totalTicks') || 0;
-    game.combat?.setFlag('tick-combat', 'totalTicks', totalTicks+normalize);
-    console.log("normalizeTicks", totalTicks);
+    if (game.combat?.started)
+    {
+        const totalTicks = game.combat?.getFlag('tick-combat', 'totalTicks') || 0;
+        game.combat?.setFlag('tick-combat', 'totalTicks', totalTicks+normalize);
+        console.log("normalizeTicks", totalTicks);
+    }
 
     await game.timeline.app.setPosition({});
 }

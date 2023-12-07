@@ -1,5 +1,13 @@
 <form style="display: flex; flex-wrap: nowrap; width: 100%;" id="timelineWrapper">
-    <div style="margin: 0; width: 60px; background-color: lightslategrey; color: white; padding: 4px;">Total: <br />{{totalTicks}}</div>
+    <div style="width: 70px; margin: 0; background-color: lightslategrey; color: white; padding: 5px;">
+        {{#if started}}
+        Total: <br />{{totalTicks}}
+        {{else}}
+            {{#if isGM}}
+            <button class="startButton" style="border: 0; background-color: #fff; color: #000;">Start</button>
+            {{/if}}
+        {{/if}}
+    </div>
     {{#each list}}
         <div class="flexcol" style="justify-content: flex-start; align-items: flex-start; margin-left: 5px; margin-right: 5px; width: 120px;">
             <div style="flex: 0; width: 100%; margin-bottom: 1em;">

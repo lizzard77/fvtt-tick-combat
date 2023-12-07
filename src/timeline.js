@@ -79,7 +79,7 @@ export class TimelineApp extends Application
 
     async setPosition({left, top, height} = {})
     {
-        let width = (await this.getData()).list.length * 120 + 60;
+        let width = (await this.getData()).list.length * 120 + 70;
         const scale = game.settings.get("tick-combat", "scale");
         super.setPosition({left, top, width, height, scale});
     }
@@ -102,14 +102,16 @@ export class TimelineApp extends Application
 
         const scale = game.settings.get("tick-combat", "scale");
         const totalTicks = game.combat?.getFlag('tick-combat', 'totalTicks') || 0;
+        const started = game.combat?.started || false;
 
         return {
             list : final,
             isGM : game.user.isGM,
             scale, 
-            totalTicks
+            totalTicks,
+            started
         }
-    };
+    }
 
     activateListeners(html) 
     {
@@ -121,7 +123,15 @@ export class TimelineApp extends Application
         html.on('click', ".delete", this._handleDeleteButton.bind(this));
         html.on('click', ".wait", this._handleWaitToggleButton.bind(this));
         html.on('click', ".hide", this._handleHideToggleButton.bind(this));
-    };
+        html.on('click', ".startButton", this._handleStartButton.bind(this));
+    }
+
+    async _handleStartButton(event) {
+        event.preventDefault();
+        game.combat?.setFlag('tick-combat', 'totalTicks', 0);
+        if (!game.combat?.started)
+            game.combat?.startCombat();
+    }
 
     async _handleEditItem(event) {
         event.preventDefault();

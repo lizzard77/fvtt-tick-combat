@@ -74,8 +74,8 @@ function updateAppWindow()
         if (game.timeline.app.rendered)
             game.timeline.app.close(true);
     } else {
-        if (!game.combat?.started)
-            game.combat?.startCombat();
+        //if (!game.combat?.started)
+        //    game.combat?.startCombat();
         game.timeline.app.render(true);
     }
 }
