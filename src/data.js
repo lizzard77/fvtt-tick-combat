@@ -169,7 +169,8 @@ export async function setEvents(events)
 
 export async function clearEvents()
 {
-    await game.combat?.unsetFlag('tick-combat', 'events');
+    if (game.user.isGM)
+        await game.combat?.unsetFlag('tick-combat', 'events');
 }
 
 
