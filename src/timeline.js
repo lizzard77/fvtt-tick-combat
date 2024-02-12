@@ -118,6 +118,7 @@ export class TimelineApp extends Application
         super.activateListeners(html);
         //html.on('blur', "input.ticks", this._handleChangeTicks.bind(this));
         html.on('keydown', "input.ticks", this._handleEnterKey.bind(this));
+        html.on('focus', "input.ticks", this._handleFocus.bind(this));
         html.on('click', ".name", this._handleEditItem.bind(this));
         html.on('click', ".ffwd", this._handleffwdButton.bind(this));
         html.on('click', ".delete", this._handleDeleteButton.bind(this));
@@ -131,6 +132,11 @@ export class TimelineApp extends Application
         game.combat?.setFlag('tick-combat', 'totalTicks', 0);
         if (!game.combat?.started)
             game.combat?.startCombat();
+    }
+
+    async _handleFocus(event) {
+        event.preventDefault();
+        event.target.select(); 
     }
 
     async _handleEditItem(event) {
