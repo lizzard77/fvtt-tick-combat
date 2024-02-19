@@ -6,9 +6,9 @@
         {
             "label": "Run Foundry",
             "type": "shell",
-            "command": "node resources/app/main.js --dataPath=/p/foundry-dev11",
+            "command": "fvtt launch",
             "options": {
-                "cwd": "c:\\p\\foundry11"
+                "cwd": "~/p/foundrydata"
             },
             "problemMatcher": []
         }

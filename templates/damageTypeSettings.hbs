@@ -1,0 +1,19 @@
+<form class="flexcol">
+    <button class="add">+</button>
+
+    <ul class="">
+        {{#each list}}
+            <li class="flexrow">
+                <input type="checkbox" name="list.{{@index}}.cumulative" value="true" {{#if this.cumulative}}checked{{/if}} />
+                <input type="text" name="list.{{@index}}.label" value="{{this.label}}" />
+                <button class="remove" data-id="{{@index}}">-</button>
+            </li>
+        {{/each}}
+    </ul>
+
+    <footer class="sheet-footer flexrow">
+        <button type="submit" name="submit">
+            <i class="fa fa-check"></i> OK
+        </button>
+    </footer>
+</form>

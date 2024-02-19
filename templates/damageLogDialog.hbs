@@ -1,0 +1,9 @@
+<p>{{amount}} {{type}} {{actor.name}}</p>
+
+<ul class="">
+        {{#each list}}
+            <li>
+                <input type="radio" name="type" value="{{@index}}" /> {{this.label}}
+            </li>
+        {{/each}}
+    </ul>

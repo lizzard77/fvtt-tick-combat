@@ -1,5 +1,7 @@
 import { clearEvents, getCombatantAndEventsList, setTicks } from "./data.js";
 import { TimelineApp } from "./timeline.js";
+import { DamageTypeSettingsApp } from "./damageTypeSettings.js";
+import { damageLog } from "./damageLogDialog.js";
 
 Hooks.on('init', () => {
     game.settings.register("tick-combat", "scale", {
@@ -13,13 +15,37 @@ Hooks.on('init', () => {
             game.timeline.app.setPosition();
         }
     });
+
+    game.settings.register("tick-combat", "damageTypes", {
+        name: "Schadensarten",
+        label: "Arten von Schaden",
+        scope: "world",
+        type: Array,
+        default: [ { label : "Blessuren", cumulative : true } ],
+        config: false
+    });
+
+    game.settings.registerMenu("tick-combat", "damageTypesMenu", {
+        name: "Schadensarten",
+        label: "Arten von Schaden festlegen",      // The text label used in the button
+        hint: "A description of what will occur in the submenu dialog.",
+        icon: "fas fa-bars",               // A Font Awesome icon used in the submenu button
+        type: DamageTypeSettingsApp,   // A FormApplication subclass
+        restricted: true                   // Restrict this submenu to gamemaster only?
+    });
+    
+     game.settings.set("tick-combat", "damageTypes", [ { label : "Blessuren", cumulative : true } ]);   
 });
+
+
 
 Hooks.on('ready', async () => {
     game.timeline = {
         app : new TimelineApp()
     }
     updateAppWindow();
+    const someVariable = game.settings.get('tick-combat','damageTypes');
+    console.log(someVariable); // expected to be 'foo'
 });
 
 Hooks.on('renderCombatTracker', (app, html, data) => {
@@ -64,6 +90,22 @@ Hooks.on("deleteCombatant", (combatant, options, userId) => {
 Hooks.on("updateActor", (actor, updateData, options, userId) => {
     console.log("updateActor");
     updateAppWindow();
+});
+
+Hooks.on("preUpdateActor", async (actor, updateData, options, userId) => {
+    console.log("updateActor");
+    if (updateData?.system.health.value !== undefined)
+        {
+            const setting = game.settings.get('tick-combat', 'damageTypes') || [];
+            if (setting.length == 0)
+                return;
+
+            const currentHealth = actor.system.health.value;
+            const newHealth = updateData.system.health.value;
+            const type = newHealth < currentHealth ? "schaden" : "heilung";
+            await damageLog(actor, type, Math.abs(currentHealth-newHealth));
+        }
+    //updateAppWindow();
 });
 
 function updateAppWindow() 
