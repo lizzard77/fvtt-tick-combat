@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../foundrydata/Data/systems/worldbuilding"
+		}
+	],
+    "settings": {}
+}

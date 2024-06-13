@@ -94,7 +94,7 @@ Hooks.on("updateActor", (actor, updateData, options, userId) => {
 
 Hooks.on("preUpdateActor", async (actor, updateData, options, userId) => {
     console.log("updateActor");
-    if (updateData?.system.health.value !== undefined)
+    if (updateData?.system?.health?.value !== undefined)
         {
             const setting = game.settings.get('tick-combat', 'damageTypes') || [];
             if (setting.length == 0)

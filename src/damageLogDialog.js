@@ -15,6 +15,15 @@ export async function damageLog(actor, type, amount)
                     console.log("Protokoll für Schaden/Heilung eingetragen");
                     const flag = actor.getFlag('tick-combat', 'damageLog') || [];
                     
+                    
+                    const attr= { "Schaden" : { }};
+                    attr.Schaden[type] = {
+                            group : "Schaden",
+                            dtype : "Number", 
+                            value: amount,
+                            label : type 
+                        };
+                    actor.update({ "system.attributes": attr });
                 }
             },
             two: {
